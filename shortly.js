@@ -2,7 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
-
+var Promise = require('bluebird');
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -78,7 +78,63 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
+app.get('/signup', function(req, res) {
+  res.render('signup');
+});
 
+app.post('/signup', function(req, res) {
+  var user = req.body.username;
+  var pass = req.body.password;
+
+  new User({ username: user }).fetch().then(function(found) {
+    if (found) {
+      res.send(200, found.attributes);
+    } else {
+      var user = new User({
+        username: user,
+        password: pass
+      }, function(hash) {
+        user.set({"password": hash});
+      });
+      user.save().then(function(newLink) {
+        console.log("user created");
+        res.redirect("/");
+      });
+    }
+  });
+});
+
+
+app.get('/login', function(req, res) {
+  res.render('login');
+});
+
+app.post('/login', function(req, res) {
+  var user = req.body.username;
+  var pass = req.body.password;
+
+  new User({ username: user }).fetch().then(function(found) {
+    if (found) {
+      res.send(200, found.attributes);
+    } else {
+      util.getUrlTitle(uri, function(err, title) {
+        if (err) {
+          console.log('Error reading URL heading: ', err);
+          return res.send(404);
+        }
+
+        var user = new User({
+          username: user,
+          password: pass
+        });
+
+        user.save().then(function(newLink) {
+          res.send(302, newLink);
+        });
+      });
+    }
+  });
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
