@@ -87,34 +87,48 @@ app.get('/signup', function(req, res) {
 });
 
 app.post('/signup', function(req, res) {
-  var user = req.body.username;
+  var username = req.body.username;
   var pass = req.body.password;
 
   new User({
-    username: user
+    username: username
   }).fetch().then(function(found) {
     if (found) {
       res.send(200, found.attributes);
     } else {
       var user = new User({
-        username: user,
+        username: username,
         password: pass
       });
-      user.save().then(function(newLink) {
+
+      user.save().then(function(newUser) {
         console.log("user created");
+        Users.add(newUser);
         res.redirect("/");
       });
     }
   });
 });
 
-
 app.get('/login', function(req, res) {
   res.render('login');
 });
 
 app.post('/login', function(req, res) {
+  var user = req.body.username;
+  var pass = req.body.password;
 
+  new User({username: user})
+    .fetch()
+    .then(function(user){
+      if(util.isValidUser(pass, user.get("password"))){
+        res.redirect("/create");
+      } else {
+        res.redirect("/signup");
+      };
+    }).catch(function(err){
+      res.redirect("/signup");
+    });
 });
 
 /************************************************************/
@@ -138,7 +152,7 @@ app.get('/*', function(req, res) {
         db.knex('urls')
           .where('code', '=', link.get('code'))
           .update({
-            visits: link.get('visits') + 1,
+            visits: link.get('visits') + 1
           }).then(function() {
             return res.redirect(link.get('url'));
           });
@@ -148,4 +162,4 @@ app.get('/*', function(req, res) {
 });
 
 console.log('Shortly is listening on 4568');
-app.listen(4560);
+app.listen(4568);

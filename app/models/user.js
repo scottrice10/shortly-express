@@ -10,9 +10,10 @@ var User = db.Model.extend({
   },
   hashPassword: function() {
     var hash = Promise.promisify(bcrypt.hash, bcrypt);
-    return hash('bacon', 8).bind(this).then(function(err, hash) {
-      this.set('password', hash);
-    });
+    return hash(this.get("password"), 8).bind(this)
+      .then(function(hash) {
+        this.set('password', hash);
+      });
   }
 });
 
