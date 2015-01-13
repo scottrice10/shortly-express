@@ -19,60 +19,64 @@ app.use(partials());
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
 // Parse forms (signup/login)
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(express.static(__dirname + '/public'));
 
 
-app.get('/', 
-function(req, res) {
-  res.render('index');
-});
-
-app.get('/create', 
-function(req, res) {
-  res.render('index');
-});
-
-app.get('/links', 
-function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
+app.get('/',
+  function(req, res) {
+    res.render('index');
   });
-});
 
-app.post('/links', 
-function(req, res) {
-  var uri = req.body.url;
+app.get('/create',
+  function(req, res) {
+    res.render('index');
+  });
 
-  if (!util.isValidUrl(uri)) {
-    console.log('Not a valid url: ', uri);
-    return res.send(404);
-  }
+app.get('/links',
+  function(req, res) {
+    Links.reset().fetch().then(function(links) {
+      res.send(200, links.models);
+    });
+  });
 
-  new Link({ url: uri }).fetch().then(function(found) {
-    if (found) {
-      res.send(200, found.attributes);
-    } else {
-      util.getUrlTitle(uri, function(err, title) {
-        if (err) {
-          console.log('Error reading URL heading: ', err);
-          return res.send(404);
-        }
+app.post('/links',
+  function(req, res) {
+    var uri = req.body.url;
 
-        var link = new Link({
-          url: uri,
-          title: title,
-          base_url: req.headers.origin
-        });
-
-        link.save().then(function(newLink) {
-          Links.add(newLink);
-          res.send(200, newLink);
-        });
-      });
+    if (!util.isValidUrl(uri)) {
+      console.log('Not a valid url: ', uri);
+      return res.send(404);
     }
+
+    new Link({
+      url: uri
+    }).fetch().then(function(found) {
+      if (found) {
+        res.send(200, found.attributes);
+      } else {
+        util.getUrlTitle(uri, function(err, title) {
+          if (err) {
+            console.log('Error reading URL heading: ', err);
+            return res.send(404);
+          }
+
+          var link = new Link({
+            url: uri,
+            title: title,
+            base_url: req.headers.origin
+          });
+
+          link.save().then(function(newLink) {
+            Links.add(newLink);
+            res.send(200, newLink);
+          });
+        });
+      }
+    });
   });
-});
 
 /************************************************************/
 // Write your authentication routes here
@@ -86,15 +90,15 @@ app.post('/signup', function(req, res) {
   var user = req.body.username;
   var pass = req.body.password;
 
-  new User({ username: user }).fetch().then(function(found) {
+  new User({
+    username: user
+  }).fetch().then(function(found) {
     if (found) {
       res.send(200, found.attributes);
     } else {
       var user = new User({
         username: user,
         password: pass
-      }, function(hash) {
-        user.set({"password": hash});
       });
       user.save().then(function(newLink) {
         console.log("user created");
@@ -110,30 +114,7 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-  var user = req.body.username;
-  var pass = req.body.password;
 
-  new User({ username: user }).fetch().then(function(found) {
-    if (found) {
-      res.send(200, found.attributes);
-    } else {
-      util.getUrlTitle(uri, function(err, title) {
-        if (err) {
-          console.log('Error reading URL heading: ', err);
-          return res.send(404);
-        }
-
-        var user = new User({
-          username: user,
-          password: pass
-        });
-
-        user.save().then(function(newLink) {
-          res.send(302, newLink);
-        });
-      });
-    }
-  });
 });
 
 /************************************************************/
@@ -143,7 +124,9 @@ app.post('/login', function(req, res) {
 /************************************************************/
 
 app.get('/*', function(req, res) {
-  new Link({ code: req.params[0] }).fetch().then(function(link) {
+  new Link({
+    code: req.params[0]
+  }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');
     } else {
@@ -165,4 +148,4 @@ app.get('/*', function(req, res) {
 });
 
 console.log('Shortly is listening on 4568');
-app.listen(4568);
+app.listen(4560);

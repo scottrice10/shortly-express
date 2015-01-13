@@ -13,7 +13,7 @@ var Link = require('../app/models/link');
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
-var xbeforeEach = function(){};
+//var xbeforeEach = function() {};
 /************************************************************/
 
 
@@ -59,15 +59,17 @@ describe('', function() {
       });
   });
 
-  describe('Link creation:', function(){
+  describe('Link creation:', function() {
 
-    var requestWithSession = request.defaults({jar: true});
+    var requestWithSession = request.defaults({
+      jar: true
+    });
 
-    beforeEach(function(done){      // create a user that we can then log-in with
+    beforeEach(function(done) { // create a user that we can then log-in with
       new User({
-          'username': 'Phillip',
-          'password': 'Phillip'
-      }).save().then(function(){
+        'username': 'Phillip',
+        'password': 'Phillip'
+      }).save().then(function() {
         var options = {
           'method': 'POST',
           'followAllRedirects': true,
@@ -100,7 +102,7 @@ describe('', function() {
       });
     });
 
-    xdescribe('Shortening links:', function(){
+    describe('Shortening links:', function() {
 
       var options = {
         'method': 'POST',
@@ -133,7 +135,7 @@ describe('', function() {
         });
       });
 
-      it('Fetches the link url title', function (done) {
+      it('Fetches the link url title', function(done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
             .where('title', '=', 'Rofl Zoo - Daily funny animal pictures')
@@ -149,18 +151,18 @@ describe('', function() {
 
     }); // 'Shortening links'
 
-    describe('With previously saved urls:', function(){
+    describe('With previously saved urls:', function() {
 
       var link;
 
-      beforeEach(function(done){
+      beforeEach(function(done) {
         // save a link to the database
         link = new Link({
           url: 'http://www.roflzoo.com/',
           title: 'Rofl Zoo - Daily funny animal pictures',
           base_url: 'http://127.0.0.1:4568'
         });
-        link.save().then(function(){
+        link.save().then(function() {
           done();
         });
       });
@@ -212,7 +214,7 @@ describe('', function() {
 
   }); // 'Link creation'
 
-  xdescribe('Priviledged Access:', function(){
+  describe('Priviledged Access:', function() {
 
     it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
       request('http://127.0.0.1:4568/', function(error, res, body) {
@@ -237,7 +239,7 @@ describe('', function() {
 
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function(){
+  describe('Account Creation:', function() {
 
     it('Signup creates a user record', function(done) {
       var options = {
@@ -285,15 +287,17 @@ describe('', function() {
 
   }); // 'Account Creation'
 
-  xdescribe('Account Login:', function(){
+  describe('Account Login:', function() {
 
-    var requestWithSession = request.defaults({jar: true});
+    var requestWithSession = request.defaults({
+      jar: true
+    });
 
-    beforeEach(function(done){
+    beforeEach(function(done) {
       new User({
-          'username': 'Phillip',
-          'password': 'Phillip'
-      }).save().then(function(){
+        'username': 'Phillip',
+        'password': 'Phillip'
+      }).save().then(function() {
         done()
       });
     })

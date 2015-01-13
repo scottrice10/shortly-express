@@ -11,7 +11,7 @@
     "test": "node shortly.js& ./node_modules/.bin/mocha --bail --reporter nyan test/ServerSpec.js; pkill -n node;"
   },
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt": "*",
     "bluebird": "1.0.8",
     "body-parser": "^1.5.2",
     "bookshelf": "~0.6.4",
