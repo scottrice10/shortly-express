@@ -138,24 +138,23 @@ app.post('/login', function(req, res) {
       var password = req.body.password;
       var hash = user.attributes.password;
 
-      res.cookie("login", "value", {expires: 0})
-      res.redirect("/");
-      //if( util.checkPass(password, hash) ) {
+      if( util.checkPass(password, hash) ) {
+        res.cookie("login", "value", {expires: 0})
+        res.redirect("/");
         //request.session.regenerate(function(){
           //request.session.user = req.body.username; //or user
           //response.redirect('/create');
         //});
-      //}
+      }
     } else {
       res.redirect("login");
     }
   });
 });
 
-app.get('/logout', function(request, response){
-    request.session.destroy(function(){
-        response.redirect('/');
-    });
+app.get('/logout', function(req, res){
+  res.cookie("login", "");
+  res.redirect("/");
 });
 
 /************************************************************/
