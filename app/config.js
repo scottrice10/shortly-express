@@ -15,7 +15,7 @@ var db = Bookshelf.initialize({
 
 db.knex.schema.hasTable('urls').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('urls', function (link) {
+    db.knex.schema.createTable('urls', function(link) {
       link.increments('id').primary();
       link.string('url', 255);
       link.string('base_url', 255);
@@ -23,7 +23,7 @@ db.knex.schema.hasTable('urls').then(function(exists) {
       link.string('title', 255);
       link.integer('visits');
       link.timestamps();
-    }).then(function (table) {
+    }).then(function(table) {
       console.log('Created Table', table);
     });
   }
@@ -31,11 +31,11 @@ db.knex.schema.hasTable('urls').then(function(exists) {
 
 db.knex.schema.hasTable('clicks').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('clicks', function (click) {
+    db.knex.schema.createTable('clicks', function(click) {
       click.increments('id').primary();
       click.integer('link_id');
       click.timestamps();
-    }).then(function (table) {
+    }).then(function(table) {
       console.log('Created Table', table);
     });
   }
@@ -47,12 +47,12 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
 
 db.knex.schema.hasTable('users').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('users', function (user) {
+    db.knex.schema.createTable('users', function(user) {
       user.increments('id').primary();
       user.string('username', 255);
       user.string('password', 255);
       user.timestamps();
-    }).then(function (table) {
+    }).then(function(table) {
       console.log('Created Table', table);
     });
   }
@@ -61,12 +61,12 @@ db.knex.schema.hasTable('users').then(function(exists) {
 
 db.knex.schema.hasTable('sessions').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('sessions', function (session) {
+    db.knex.schema.createTable('sessions', function(session) {
       session.increments('id').primary();
       session.string('username', 255);
-      user.string('cookieValue', 255);
-      user.timestamps();
-    }).then(function (table) {
+      session.string('cookieValue', 255);
+      session.timestamps();
+    }).then(function(table) {
       console.log('Created Table', table);
     });
   }
