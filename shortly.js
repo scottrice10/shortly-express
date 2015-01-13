@@ -11,6 +11,10 @@ var Links = require('./app/collections/links');
 var Link = require('./app/models/link');
 var Click = require('./app/models/click');
 
+//var cookieSession = require('cookie-session');
+var cookieParser = require('cookie-parser');
+//var session = require('express-session');
+
 var app = express();
 
 app.set('views', __dirname + '/views');
@@ -22,14 +26,31 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+//cookie-based authentication
+//app.use(cookieSession({
+//    keys: ['secret1', 'secret2']
+//}));
+
+//app.use(express.session());
+
+app.use(cookieParser())
+
+function restrict(req, res, next) {
+  if (req.cookies.login) {
+    next();
+  } else {
+    //req.session.error = 'Access denied!';
+    res.redirect('/login');
+  }
+}
 
 app.get('/', 
 function(req, res) {
+  console.log("Cookies: ", req.cookies.login);
   res.render('index');
 });
 
-app.get('/create', 
-function(req, res) {
+app.get('/create', restrict, function(req, res) {
   res.render('index');
 });
 
@@ -83,6 +104,7 @@ app.get('/signup', function(req, res) {
 });
 
 app.post('/signup', function(req, res) {
+  console.log(req.body);
   var user = req.body.username;
   var pass = req.body.password;
 
@@ -91,10 +113,8 @@ app.post('/signup', function(req, res) {
       res.send(200, found.attributes);
     } else {
       var user = new User({
-        username: user,
-        password: pass
-      }, function(hash) {
-        user.set({"password": hash});
+        username: req.body.username,
+        password: req.body.password
       });
       user.save().then(function(newLink) {
         console.log("user created");
@@ -113,27 +133,29 @@ app.post('/login', function(req, res) {
   var user = req.body.username;
   var pass = req.body.password;
 
-  new User({ username: user }).fetch().then(function(found) {
-    if (found) {
-      res.send(200, found.attributes);
+  new User({ username: user }).fetch().then(function(user) {
+    if (user) {
+      var password = req.body.password;
+      var hash = user.attributes.password;
+
+      res.cookie("login", "value", {expires: 0})
+      res.redirect("/");
+      //if( util.checkPass(password, hash) ) {
+        //request.session.regenerate(function(){
+          //request.session.user = req.body.username; //or user
+          //response.redirect('/create');
+        //});
+      //}
     } else {
-      util.getUrlTitle(uri, function(err, title) {
-        if (err) {
-          console.log('Error reading URL heading: ', err);
-          return res.send(404);
-        }
-
-        var user = new User({
-          username: user,
-          password: pass
-        });
-
-        user.save().then(function(newLink) {
-          res.send(302, newLink);
-        });
-      });
+      res.redirect("login");
     }
   });
+});
+
+app.get('/logout', function(request, response){
+    request.session.destroy(function(){
+        response.redirect('/');
+    });
 });
 
 /************************************************************/
